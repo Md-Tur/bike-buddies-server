@@ -24,7 +24,14 @@ async function run() {
             res.send(products);
         });
 
-
+        //get product by id
+        app.get('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const query = { _id: ObjectId(id) };
+            const product = await productsCollection.findOne(query);
+            res.send(product);
+        })
     }
     finally {
 
