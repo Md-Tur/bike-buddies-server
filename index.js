@@ -16,6 +16,7 @@ async function run() {
     try {
         await client.connect();
         const productsCollection = client.db('bike_buddies').collection('products');
+        const orderCollection = client.db('bike_buddies').collection('orders');
 
         app.get('/product', async (req, res) => {
             const query = {};
@@ -27,10 +28,15 @@ async function run() {
         //get product by id
         app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
-            console.log(id);
             const query = { _id: ObjectId(id) };
             const product = await productsCollection.findOne(query);
             res.send(product);
+        })
+
+        app.post('/product', async (req, res) => {
+            const newProduct = req.body;
+            const result = await orderCollection.insertOne(newProduct);
+            res.send(result);
         })
     }
     finally {
