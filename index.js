@@ -31,13 +31,23 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const product = await productsCollection.findOne(query);
             res.send(product);
-        })
+        });
 
         app.post('/product', async (req, res) => {
             const newProduct = req.body;
             const result = await orderCollection.insertOne(newProduct);
             res.send(result);
-        })
+        });
+
+        // search one's order by email
+        app.get('/order', async (req, res) => {
+            const email = req.query;
+            const query = { email: email };
+            const cursor = orderCollection.find(query);
+            const orders = await cursor.toArray();
+            res.send(orders);
+        });
+
     }
     finally {
 
