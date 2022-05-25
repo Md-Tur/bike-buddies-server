@@ -18,6 +18,7 @@ async function run() {
         await client.connect();
         const productsCollection = client.db('bike_buddies').collection('products');
         const orderCollection = client.db('bike_buddies').collection('orders');
+        const usersCollection = client.db('bike_buddies').collection('users');
 
         //JWT token
         app.post('/login', async (req, res) => {
@@ -64,6 +65,19 @@ async function run() {
             const query = { email: email };
             const orders = await orderCollection.find(query).toArray();
             res.send(orders);
+        });
+
+        // collecting users data
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
         });
 
     }
