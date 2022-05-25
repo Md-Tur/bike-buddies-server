@@ -58,6 +58,14 @@ async function run() {
             res.send(orders);
         });
 
+        // show one's order in dashboard
+        app.get('/order', async (req, res) => {
+            const email = req.query;
+            const query = { email: email };
+            const orders = await orderCollection.find(query).toArray();
+            res.send(orders);
+        });
+
     }
     finally {
 
