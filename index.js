@@ -50,22 +50,29 @@ async function run() {
             res.send(result);
         });
 
-        // search one's order by email
         app.get('/order', async (req, res) => {
+            const email = req.query.user;
+            const query = { email: email };
+            const order = await orderCollection.find(query).toArray();
+            res.send(order);
+        })
+
+        // search one's order by email
+        /* app.get('/order', async (req, res) => {
             const email = req.query;
             const query = { email: email };
             const cursor = orderCollection.find(query);
             const orders = await cursor.toArray();
             res.send(orders);
-        });
+        }); */
 
         // show one's order in dashboard
-        app.get('/order', async (req, res) => {
+        /* app.get('/order', async (req, res) => {
             const email = req.query;
             const query = { email: email };
             const orders = await orderCollection.find(query).toArray();
             res.send(orders);
-        });
+        }); */
 
         // collecting all users data
         app.put('/user/:email', async (req, res) => {
