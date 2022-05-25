@@ -19,6 +19,7 @@ async function run() {
         const productsCollection = client.db('bike_buddies').collection('products');
         const orderCollection = client.db('bike_buddies').collection('orders');
         const usersCollection = client.db('bike_buddies').collection('users');
+        const reviewCollection = client.db('bike_buddies').collection('reviews');
 
         //JWT token
         app.post('/login', async (req, res) => {
@@ -50,31 +51,28 @@ async function run() {
             res.send(result);
         });
 
+        // show my order by email
         app.get('/order', async (req, res) => {
             const email = req.query.user;
             const query = { email: email };
             const order = await orderCollection.find(query).toArray();
             res.send(order);
+        });
+        //save review
+        app.post('/review', async (req, res) => {
+            const newReview = req.body;
+            const result = await reviewCollection.insertOne(newReview);
+            res.send(result);
         })
 
-        // search one's order by email
-        /* app.get('/order', async (req, res) => {
-            const email = req.query;
-            const query = { email: email };
-            const cursor = orderCollection.find(query);
-            const orders = await cursor.toArray();
-            res.send(orders);
-        }); */
+        //Review
+        app.get('/review', async (req, res) => {
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+        });
 
-        // show one's order in dashboard
-        /* app.get('/order', async (req, res) => {
-            const email = req.query;
-            const query = { email: email };
-            const orders = await orderCollection.find(query).toArray();
-            res.send(orders);
-        }); */
-
-        // collecting all users data
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
@@ -87,6 +85,8 @@ async function run() {
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
             res.send({ result, token });
         });
+
+
 
         // getting all users
         app.get('/user', async (req, res) => {
