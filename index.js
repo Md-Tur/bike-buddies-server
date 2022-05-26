@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
@@ -30,6 +30,22 @@ async function run() {
             res.send({ accessToken });
         });
 
+        // JWT token verification function
+        function verifyJWT(req, res, next) {
+            const authHeader = req.headers.authorization;
+            if (!authHeader) {
+                return res.status(401).send({ message: 'Unauthorized Access' });
+            }
+            const token = authHeader.split(' ')[1];
+            jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+                if (err) {
+                    return res.status(403).send({ message: 'Forbidden Access' });
+                }
+                req.decoded = decoded;
+                next();
+            });
+        };
+
         app.get('/product', async (req, res) => {
             const query = {};
             const cursor = productsCollection.find(query);
@@ -52,12 +68,19 @@ async function run() {
         });
 
         // show my order by email
-        app.get('/order', async (req, res) => {
+        app.get('/order', verifyJWT, async (req, res) => {
             const email = req.query.user;
-            const query = { email: email };
-            const order = await orderCollection.find(query).toArray();
-            res.send(order);
+            const decodedEmail = req.decoded.email;
+            if (email === decodedEmail) {
+                const query = { email: email };
+                const order = await orderCollection.find(query).toArray();
+                return res.send(order);
+            }
+            else {
+                return res.status(403).send({ message: 'Forbidden Access' });
+            }
         });
+
         //save review
         app.post('/review', async (req, res) => {
             const newReview = req.body;
@@ -90,11 +113,9 @@ async function run() {
                 $set: user,
             };
             const result = await usersCollection.updateOne(filter, updateDoc, options);
-            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
             res.send({ result, token });
         });
-
-
 
         // getting all users
         app.get('/user', async (req, res) => {
