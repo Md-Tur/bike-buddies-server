@@ -46,11 +46,18 @@ async function run() {
             });
         };
 
-        app.get('/product', async (req, res) => {
+        app.get('/addproduct', async (req, res) => {
             const query = {};
             const cursor = productsCollection.find(query);
             const products = await cursor.toArray();
             res.send(products);
+        });
+
+        app.get('/orders', async (req, res) => {
+            const query = {};
+            const cursor = orderCollection.find(query);
+            const orders = await cursor.toArray();
+            res.send(orders);
         });
 
         //get product by id
@@ -86,7 +93,7 @@ async function run() {
             const newReview = req.body;
             const result = await reviewCollection.insertOne(newReview);
             res.send(result);
-        })
+        });
 
         //Review
         app.get('/review', async (req, res) => {
@@ -102,7 +109,7 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const result = await orderCollection.deleteOne(query);
             res.send(result);
-        })
+        });
 
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
@@ -147,6 +154,28 @@ async function run() {
             else {
                 res.status(403).send({ message: 'Forbidden Access' });
             }
+        });
+
+        //add product
+        app.post('/product', async (req, res) => {
+            const newProduct = req.body;
+            const result = await productsCollection.insertOne(newProduct);
+            res.send(result);
+        });
+
+        //manage product
+        app.delete('/manageproduct/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productsCollection.deleteOne(query);
+            res.send(result);
+        });
+
+        //addprofile
+        app.post('/myprofile', async (req, res) => {
+            const newProduct = req.body;
+            const result = await profileCollection.insertOne(newProduct);
+            res.send(result);
         });
 
     }
