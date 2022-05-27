@@ -46,7 +46,7 @@ async function run() {
             });
         };
 
-        app.get('/addproduct', async (req, res) => {
+        app.get('/product', async (req, res) => {
             const query = {};
             const cursor = productsCollection.find(query);
             const products = await cursor.toArray();
@@ -68,9 +68,16 @@ async function run() {
             res.send(product);
         });
 
-        app.post('/product', async (req, res) => {
+        app.post('/addproduct', async (req, res) => {
             const newProduct = req.body;
             const result = await orderCollection.insertOne(newProduct);
+            res.send(result);
+        });
+
+        //add product
+        app.post('/product', async (req, res) => {
+            const newProduct = req.body;
+            const result = await productsCollection.insertOne(newProduct);
             res.send(result);
         });
 
@@ -154,13 +161,6 @@ async function run() {
             else {
                 res.status(403).send({ message: 'Forbidden Access' });
             }
-        });
-
-        //add product
-        app.post('/product', async (req, res) => {
-            const newProduct = req.body;
-            const result = await productsCollection.insertOne(newProduct);
-            res.send(result);
         });
 
         //manage product
