@@ -6,13 +6,13 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
-// const corsOptions = {
-//     origin: '*',
-//     credentials: true,
-//     optionSuccessStatus: 200,
-// }
+const corsConfig = {
+    origin: true,
+    credentials: true
+}
 
-app.use(cors());
+app.use(cors(corsConfig));
+app.options('*', (corsConfig));
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.yvqsm.mongodb.net/?retryWrites=true&w=majority`;
