@@ -6,12 +6,6 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
-// const corsOptions = {
-//     origin: '*',
-//     credentials: true,
-//     optionSuccessStatus: 200,
-// }
-
 app.use(cors());
 app.use(express.json());
 
@@ -27,7 +21,7 @@ async function run() {
         const usersCollection = client.db('bike_buddies').collection('users');
         const reviewCollection = client.db('bike_buddies').collection('reviews');
 
-        //JWT token
+        //JWT token 
         app.post('/login', async (req, res) => {
             const user = req.body;
             const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
@@ -36,7 +30,7 @@ async function run() {
             res.send({ accessToken });
         });
 
-        // JWT token verification function
+        // JWT token verification function 
         function verifyJWT(req, res, next) {
             const authHeader = req.headers.authorization;
             if (!authHeader) {
@@ -52,6 +46,7 @@ async function run() {
             });
         };
 
+        // get all product 
         app.get('/product', async (req, res) => {
             const query = {};
             const cursor = productsCollection.find(query);
@@ -59,6 +54,7 @@ async function run() {
             res.send(products);
         });
 
+        // order history for ADMIN 
         app.get('/orders', async (req, res) => {
             const query = {};
             const cursor = orderCollection.find(query);
@@ -66,7 +62,7 @@ async function run() {
             res.send(orders);
         });
 
-        //get product by id
+        //get product by id 
         app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -74,20 +70,21 @@ async function run() {
             res.send(product);
         });
 
-        app.post('/addproduct', async (req, res) => {
+        // save order 
+        app.post('/product', async (req, res) => {
             const newProduct = req.body;
             const result = await orderCollection.insertOne(newProduct);
             res.send(result);
         });
 
-        //add product
-        app.post('/product', async (req, res) => {
+        //add product by admin 
+        app.post('/addproduct', async (req, res) => {
             const newProduct = req.body;
             const result = await productsCollection.insertOne(newProduct);
             res.send(result);
         });
 
-        // show my order by email
+        // show my order by email 
         app.get('/order', verifyJWT, async (req, res) => {
             const email = req.query.user;
             const decodedEmail = req.decoded.email;
@@ -101,14 +98,14 @@ async function run() {
             }
         });
 
-        //save review
+        //save review 
         app.post('/review', async (req, res) => {
             const newReview = req.body;
             const result = await reviewCollection.insertOne(newReview);
             res.send(result);
         });
 
-        //Review
+        //get Review 
         app.get('/review', async (req, res) => {
             const query = {};
             const cursor = reviewCollection.find(query);
@@ -116,7 +113,7 @@ async function run() {
             res.send(reviews);
         });
 
-        //delete order
+        // cancel order by user
         app.delete('/order/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -124,6 +121,7 @@ async function run() {
             res.send(result);
         });
 
+        // all users collection 
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
@@ -137,13 +135,13 @@ async function run() {
             res.send({ result, token });
         });
 
-        // getting all users
+        // getting all users 
         app.get('/user', async (req, res) => {
             const users = await usersCollection.find().toArray();
             res.send(users);
         });
 
-        // checking if admin or normal user & showing route
+        // checking if admin or normal user & showing route 
         app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
             const user = await usersCollection.findOne({ email: email });
@@ -151,7 +149,7 @@ async function run() {
             res.send({ admin: isAdmin });
         });
 
-        // making admin
+        // making admin 
         app.put('/user/admin/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
             const requester = req.decoded.email;
@@ -169,7 +167,7 @@ async function run() {
             }
         });
 
-        //manage product
+        // delete product by admin 
         app.delete('/manageproduct/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -177,7 +175,7 @@ async function run() {
             res.send(result);
         });
 
-        //addprofile
+        //add profile 
         app.post('/myprofile', async (req, res) => {
             const newProduct = req.body;
             const result = await profileCollection.insertOne(newProduct);
