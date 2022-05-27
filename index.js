@@ -6,19 +6,11 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
-const corsConfig = {
-    origin: "https://bike-buddies-4cd22.web.app",
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
-}
-app.use(cors(corsConfig))
-app.options("https://bike-buddies-4cd22.web.app", cors(corsConfig))
+
+app.use(cors({ origin: "https://bike-buddies-4cd22.web.app" }))
+
 app.use(express.json())
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*")
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept,authorization")
-    next()
-})
+
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.yvqsm.mongodb.net/?retryWrites=true&w=majority`;
 
