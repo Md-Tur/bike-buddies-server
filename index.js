@@ -23,6 +23,7 @@ async function run() {
         const orderCollection = client.db('bike_buddies').collection('orders');
         const usersCollection = client.db('bike_buddies').collection('users');
         const reviewCollection = client.db('bike_buddies').collection('reviews');
+        const profileCollection = client.db('bike_buddies').collection('profile');
 
         //JWT token 
         app.post('/login', async (req, res) => {
@@ -179,10 +180,18 @@ async function run() {
         });
 
         //add profile 
-        app.post('/myprofile', async (req, res) => {
-            const newProduct = req.body;
-            const result = await profileCollection.insertOne(newProduct);
+        app.post("/my_profile", async (req, res) => {
+            const profile = req.body;
+            const result = await profileCollection.insertOne(profile);
             res.send(result);
+        });
+
+        //show profile
+        app.get("/view_profile", async (req, res) => {
+            const email = req.query.user;
+            const query = { email: email };
+            const myprofile = await profileCollection.find(query).toArray();
+            res.send(myprofile);
         });
 
     }
